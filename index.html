@@ -1,11 +1,363 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>My site</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>THE BUTTON — proo.space</title>
+<link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+:root{--bg:#0a0a0a;--white:#f0f0f0;}
+body{
+  background:var(--bg);
+  font-family:'Rajdhani',sans-serif;
+  color:var(--white);
+  min-height:100vh;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  overflow:hidden;
+  cursor:none;
+  user-select:none;
+}
+
+/* cursor */
+#cur{position:fixed;width:14px;height:14px;border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:background 0.2s,transform 0.1s;background:#fff;mix-blend-mode:difference;}
+
+/* bg blob */
+#blob{
+  position:fixed;inset:0;z-index:0;
+  background:radial-gradient(ellipse at 50% 50%, rgba(255,255,255,0.03) 0%, transparent 70%);
+  transition:background 0.5s;
+}
+
+/* noise */
+body::after{content:'';position:fixed;inset:0;opacity:0.12;pointer-events:none;z-index:1000;
+background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+
+.wrap{position:relative;z-index:10;display:flex;flex-direction:column;align-items:center;gap:0;width:90%;max-width:700px;}
+
+/* counter */
+.counter{
+  font-family:'Black Ops One',cursive;
+  font-size:11px;letter-spacing:4px;
+  color:rgba(255,255,255,0.15);
+  margin-bottom:30px;
+  transition:color 0.3s;
+}
+
+/* output card */
+#output{
+  min-height:140px;
+  width:100%;
+  display:flex;align-items:center;justify-content:center;
+  flex-direction:column;
+  text-align:center;
+  padding:30px 20px;
+  margin-bottom:40px;
+  position:relative;
+  transition:all 0.3s;
+}
+
+.out-tag{
+  font-size:9px;letter-spacing:5px;
+  margin-bottom:14px;
+  font-weight:700;
+  opacity:0.5;
+}
+
+.out-text{
+  font-size:clamp(18px,4.5vw,28px);
+  font-weight:700;
+  line-height:1.4;
+  letter-spacing:0.3px;
+  transition:color 0.3s;
+}
+
+.out-sub{
+  font-size:12px;
+  margin-top:12px;
+  opacity:0.3;
+  letter-spacing:1px;
+  font-style:italic;
+}
+
+/* THE BUTTON */
+#btn{
+  font-family:'Black Ops One',cursive;
+  font-size:clamp(22px,6vw,36px);
+  letter-spacing:5px;
+  padding:22px 60px;
+  background:var(--white);
+  color:#000;
+  border:none;
+  cursor:none;
+  position:relative;
+  overflow:hidden;
+  transition:transform 0.08s,box-shadow 0.2s;
+  box-shadow:0 0 0 rgba(255,255,255,0);
+}
+#btn::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent,rgba(0,0,0,0.1),transparent);
+  transform:translateX(-100%);
+  animation:shine 3s infinite;
+}
+@keyframes shine{to{transform:translateX(100%);}}
+#btn:hover{transform:scale(1.04);box-shadow:0 0 40px rgba(255,255,255,0.15);}
+#btn:active{transform:scale(0.95);}
+
+.hint{
+  margin-top:20px;
+  font-size:10px;letter-spacing:3px;
+  color:rgba(255,255,255,0.1);
+}
+
+/* FLASH OVERLAY */
+#flash{
+  position:fixed;inset:0;z-index:500;
+  pointer-events:none;
+  opacity:0;
+  transition:opacity 0.1s;
+}
+
+/* PARTICLES */
+.p{position:fixed;pointer-events:none;z-index:400;border-radius:50%;animation:pfall ease forwards;}
+@keyframes pfall{0%{opacity:1;transform:translate(0,0) scale(1);}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(0);}}
+
+/* shake */
+@keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-8px) rotate(-1deg);}75%{transform:translateX(8px) rotate(1deg);}}
+.shake{animation:shake 0.3s ease;}
+
+/* slide in */
+@keyframes slidein{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+.slidein{animation:slidein 0.3s ease forwards;}
+
+/* categories styling */
+.cat-hacker .out-tag{color:#00ff88;}
+.cat-hacker .out-text{color:#00ff88;}
+.cat-hacker #btn{background:#00ff88;color:#000;}
+
+.cat-aunty .out-tag{color:#ff88cc;}
+.cat-aunty .out-text{color:#ff88cc;}
+.cat-aunty #btn{background:#ff88cc;color:#000;}
+
+.cat-advice .out-tag{color:#ffd700;}
+.cat-advice .out-text{color:#ffd700;}
+.cat-advice #btn{background:#ffd700;color:#000;}
+
+.cat-roast .out-tag{color:#ff4422;}
+.cat-roast .out-text{color:#ff4422;}
+.cat-roast #btn{background:#ff4422;color:#fff;}
+
+.cat-fact .out-tag{color:#88aaff;}
+.cat-fact .out-text{color:#88aaff;}
+.cat-fact #btn{background:#88aaff;color:#000;}
+
+.cat-desi .out-tag{color:#ff8800;}
+.cat-desi .out-text{color:#ff8800;}
+.cat-desi #btn{background:#ff8800;color:#000;}
+
+@media(hover:none){#cur{display:none;}*{cursor:auto!important;}#btn:hover{transform:none;}}
+</style>
 </head>
 <body>
+<div id="cur"></div>
+<div id="blob"></div>
+<div id="flash"></div>
 
-<h1>Hello gareebon</h1>
+<div class="wrap">
+  <div class="counter" id="counter">CLICK THE BUTTON. TRUST.</div>
+  <div id="output">
+    <div class="out-tag" id="out-tag">???</div>
+    <div class="out-text" id="out-text">Kuch toh hoga. Ya nahi bhi hoga.</div>
+    <div class="out-sub" id="out-sub">proo.space ki taraf se namaste</div>
+  </div>
+  <button id="btn" onclick="go()">PRESS ME</button>
+  <div class="hint" id="hint">NO IDEA WHAT WILL HAPPEN. THAT'S THE POINT.</div>
+</div>
 
+<script>
+// cursor
+const cur=document.getElementById('cur');
+document.addEventListener('mousemove',e=>{cur.style.left=e.clientX+'px';cur.style.top=e.clientY+'px';});
+document.addEventListener('mousedown',()=>cur.style.transform='translate(-50%,-50%) scale(2)');
+document.addEventListener('mouseup',()=>cur.style.transform='translate(-50%,-50%) scale(1)');
+
+const CONTENT = {
+  hacker:[
+    {t:"HACKING INITIATED",m:"Teri WiFi ka password: 12345678\n(ye guess tha, hum actually nahi jaante)",sub:"cybersecurity pro tip"},
+    {t:"SYSTEM BREACHED",m:"Target located: teri maa ka WhatsApp group\n'Beta log' mein invited kar diya tujhe",sub:"collateral damage"},
+    {t:"VIRUS DEPLOYED",m:"virus.exe successfully installed\nkarta kya hai: sirf Never Gonna Give You Up bajata hai",sub:"rickroll malware v2.0"},
+    {t:"IP TRACED",m:"tera IP address: 420.69.lol.bruh\nLocation: Clearly Ghar Pe Baitha Hai",sub:"precise geolocation"},
+    {t:"FIREWALL BYPASSED",m:"access granted to:\nabsolutely nothing classified\njust ur search history 😬",sub:"we saw everything"},
+    {t:"DOWNLOADING RAM",m:"████████░░ 80%...\nERROR: RAM already full of regret",sub:"upgrade recommended"},
+    {t:"DATABASE HACKED",m:"sensitive data found:\n- 47 unfinished projects\n- 0 finished projects\n- 12 tabs of Stack Overflow",sub:"damning evidence"},
+    {t:"ENCRYPTION CRACKED",m:"encrypted message decoded:\n'Tu kabhi kuch nahi karega'\nsource: teri inner voice",sub:"brutal decryption"},
+    {t:"SATELLITE HACKED",m:"satellite redirected to track:\nRaju Bhaiya (pizza delivery)\nETA: 'jab aaye tab aaye'",sub:"national security concern"},
+    {t:"MAINFRAME PENETRATED",m:"found in mainframe:\n1000 gb of youtube shorts\n0 gb of actual work\nwe're not surprised",sub:"forensic analysis complete"},
+  ],
+  aunty:[
+    {t:"AUNTY NETWORK ALERT",m:"Padosi aunty update:\n'Tumhara beta toh saara din phone pe rehta hai'\nSource: direct observation from balcony",sub:"neighbourhood intelligence"},
+    {t:"RISHTA INCOMING",m:"Aunty ji has found a match for you:\nLadki: Engineer\nBachpan mein ek baar mila tha\nShadi: Next month ideally",sub:"shaadi.com but worse"},
+    {t:"FAMILY GROUP MESSAGE",m:"Chachi ne forward kiya:\n'Beta ye padho, bahut important hai'\n[15 year old WhatsApp forward about onions]",sub:"family group intelligence"},
+    {t:"COMPARISON ACTIVATED",m:"Aunty.exe running...\n'Sharma ji ka beta doctor ban gaya'\n'Tu kya kar raha hai zindagi mein?'\nerror: no response found",sub:"annual evaluation"},
+    {t:"GOSSIP DETECTED",m:"Breaking: colony mein naya scandal\n'3rd floor waale uncle ne new scooter liya'\nKisne bataya? Sabko pata hai.",sub:"reliable sources"},
+    {t:"RISHTA REJECTED",m:"Aunty report:\nLadka theek tha par\n'Ghar chhota lag raha tha'\n'Baal bhi thode zyada hain'\nNext candidate ready hai",sub:"rishta committee decision"},
+    {t:"MOM RADAR ACTIVATED",m:"Maa detection system:\n- Tu kab soya: KNOWN\n- Tune kya khaya: KNOWN\n- Tera future plan: UNKNOWN (tujhe bhi)",sub:"maternal omniscience"},
+    {t:"COLONY NEWS",m:"Update from society:\nNew rule: No cricket in parking\nBachche: immediately started playing in parking",sub:"democracy in action"},
+    {t:"SHAADI SEASON",m:"November incoming.\nShadi invitations: 7\nDresses ironed: 0\nAttendance probability: forced",sub:"wedding calendar"},
+    {t:"DAD REPORT",m:"Papa ne dekha tu phone pe tha\nPapa: 'kya kar raha hai?'\nTu: 'kuch nahi'\nPapa: *disappears silently*\nWorst verdict.",sub:"silent judgement"},
+  ],
+  advice:[
+    {t:"LIFE ADVICE",m:"Aaj kuch productive karne ki zaroorat nahi.\nKal bhi nahi.\nParso dekhte hain.",sub:"certified life coach"},
+    {t:"MOTIVATIONAL",m:"Sapne dekh. Bade sapne.\nPhir so ja.\nSapne toh tab bhi aayenge.",sub:"inspiration unlocked"},
+    {t:"FINANCIAL TIP",m:"Best investment:\nApni maa ko chai banake do.\nROI: khana milega + emotional security",sub:"warren buffett nahi jaanta ye"},
+    {t:"CAREER GUIDANCE",m:"Job dhundhna chod.\nEk bot bana.\nCopy paste kar.\nKhud ko 'developer' keh.\nBas.",sub:"linkedin approved"},
+    {t:"HEALTH ADVICE",m:"Aaj gym ja.\njk mat ja.\nMaggi bana.\nZindagi ek baar milti hai.",sub:"certified nutritionist"},
+    {t:"RELATIONSHIP TIP",m:"Best relationship advice:\nPehle khud se dost ban.\nPhir dekhte hain.\nAbhi ke liye — Discord.",sub:"therapist approved (nahi hai)"},
+    {t:"PRODUCTIVITY HACK",m:"5 AM uthna mat.\n10 AM uth.\nChai pi.\n1 kaam kar.\nHeroic.",sub:"atomic habits but desi"},
+    {t:"STUDY TIP",m:"Padhai ka best time:\nPariksha se ek raat pehle.\nScience proven.\n(science ne prove nahi kiya)",sub:"academic excellence"},
+    {t:"SOCIAL MEDIA TIP",m:"LinkedIn pe mat ja aaj.\nZindagi behtar ho jaayegi.\nYe experiment kar ke dekh.",sub:"mental health approved"},
+    {t:"DEEP WISDOM",m:"Jo hoga, acha hoga.\nAur agar acha na hua?\nTab bhi kuch nahi kar sakta.\nToh chill kar.",sub:"ancient sigma wisdom"},
+  ],
+  roast:[
+    {t:"PERSONAL ROAST",m:"Tu itne tabs kholta hai ki\nChrome ne teri photo room mein lagayi hai\nwanted poster ki jagah.",sub:"browser ke records mein hai"},
+    {t:"CAREER ROAST",m:"Teri 5 year plan:\nSaal 1: 'dekhte hain'\nSaal 2: 'abhi nahi'\nSaal 3-5: ye repeat karo",sub:"consultant ki advice"},
+    {t:"SLEEP ROAST",m:"Tu raat ko jaagta hai\nisliye nahi ki productive hai,\nbalkiye nahi ki so sakta.\nAntar samajh.",sub:"certified insomniac"},
+    {t:"SOCIAL ROAST",m:"Teri social life:\n- Discord: active\n- Real duniya: seen, not replied",sub:"anthropological study"},
+    {t:"GYM ROAST",m:"Tune gym join ki thi na?\n3 saal pehle?\nMembership card\nab bookmark hai browser mein.",sub:"fitness journey"},
+    {t:"CODE ROAST",m:"Tera code itna copied hai\nki Stack Overflow ne\nCopyright claim bheja hai.",sub:"intellectual property"},
+    {t:"PHONE ROAST",m:"Tera phone battery:\n7 AM: 100%\n9 AM: 34%\nKya kar raha tha 2 ghante??\n(YouTube shorts, obviously)",sub:"energy audit"},
+    {t:"AMBITION ROAST",m:"Teri ambition itni badi hai ki\nsirf sapno mein fit hoti hai.\nReal life mein: 'dekhte hain yaar'",sub:"motivational speaker"},
+    {t:"ATTENTION ROAST",m:"Tu ye website khol raha/rahi hai\nmatlub tujhe koi kaam nahi.\nHum judge nahi kar rahe.\nKar rahe hain.",sub:"psychological profile"},
+    {t:"RIZZ ROAST",m:"Teri rizz level:\nMain.java compile nahi hua.\nError: charm not found.\nSolution: Stack Overflow pe bhi nahi hai.",sub:"dating coach"},
+  ],
+  fact:[
+    {t:"USELESS FACT",m:"Agar tu apni zindagi ke saare\n'Haan kal se pakka' bol ke jo ghante waste kiye\nwapas le, 3 saal milenge.",sub:"time audit report"},
+    {t:"DID YOU KNOW",m:"Octopus ke 3 dil hote hain.\nTere paas 1 hai.\nAur wo bhi half broken hai probably.\nOctopus better hai.",sub:"marine biology"},
+    {t:"SCIENCE FACT",m:"Neend ki kami se\ninsaan pagal ho jaata hai.\nTu kitne din se properly soya nahi?\n...exactly.",sub:"sleep research institute"},
+    {t:"ECONOMY FACT",m:"India mein har second\n2 naye LinkedIn posts aate hain\n'Excited to share that I...'\nDono skip kar.",sub:"social media economics"},
+    {t:"HISTORICAL FACT",m:"1440 mein Gutenberg ne\nprinting press banaya tha.\nTab se log books print karte hain.\nTu abhi bhi PDF nahi padha.\nProgress.",sub:"historical perspective"},
+    {t:"PSYCHOLOGY FACT",m:"Research kehti hai:\nInsan average 47% time\nmind-wandering mein bitaata hai.\nTu: 94%.\nYe assumption hai. Sahi hai.",sub:"cognitive science"},
+    {t:"MATH FACT",m:"Agar tu roz 1 ghanta\nkuch useful kare\n365 ghante = 15 din productive\nTu roz kuch useful nahi karta.\nCalculation failed.",sub:"applied mathematics"},
+    {t:"BIOLOGY FACT",m:"Human body mein\n37 trillion cells hain.\nSab kuch chal raha hai tere andar.\nAur tu abhi bhi decide nahi kar paya\nkya khaana hai aaj raat.",sub:"existential biology"},
+    {t:"TECH FACT",m:"Average developer:\n20% actual coding\n80% reading documentation\nStack Overflow\naur existential crisis.",sub:"software engineering"},
+    {t:"RANDOM FACT",m:"Bandar bhi boring logo ko\nignore karte hain.\nYe sach hai.\nHum ne research nahi ki.\nLagta hai sach hai.",sub:"zoological study"},
+  ],
+  desi:[
+    {t:"DESI MOMENT",m:"Tu chai banane gaya.\nWapas aaya.\nYouTube pe koi video chal raha tha.\nAb 2 ghante ho gaye.\nChai thandi ho gayi.",sub:"relatable experience"},
+    {t:"INDIAN TIMING",m:"Party ka time: 7 PM\nLog aayenge: 9:30 PM\nKhaana: 10:30 PM\nGhar: 1 AM\nYe sab 'plan' tha.",sub:"IST (indian stretchable time)"},
+    {t:"JUGAAD ALERT",m:"Agar koi cheez toot jaaye:\nStep 1: Cellotape\nStep 2: Fevikwik\nStep 3: 'Ho gaya'\nStep 4: Repeat in 3 days",sub:"desi engineering"},
+    {t:"GHAR KA KHANA",m:"Bahar ka khana: ₹500\nGhar ka khana: free\nMaa ki reaction bahar khaane par: priceless damage\nResult: ghar pe hi khata/khati hai",sub:"economic analysis"},
+    {t:"LIGHT BAND KAR",m:"Ghar se nikalte waqt:\n- Light band ki\n- Fan band kiya\n- AC band kiya\n- Mobile charger plug mein chod diya\nPapa: *notices immediately*",sub:"household audit"},
+    {t:"EXAM PREP",m:"Exam kal hai.\nTune aaj:\n10 AM: syllabus dekha\n11 AM: chai pi\n12 PM: YouTube\n11 PM: ab padhunga\n12 AM: kal pakka",sub:"academic planning"},
+    {t:"RISHTA MATH",m:"Rishta aaya:\nLadka/ladki: theek hai\nGhar: theek hai\nPar:\nDono ki kundali match nahi ki\nSab cancel.\nAstrology > everything.",sub:"matrimonial algorithm"},
+    {t:"BIJLI BILL",m:"Bijli ka bill aaya.\nPapa ne dekha.\nPuri family ne 2 din andheron mein guzi.\nPaas ke dukaan wale ne poochha: 'sab theek hai?'",sub:"electricity economics"},
+    {t:"CRICKET LOGIC",m:"India lose kiya.\n'Pitch kharab thi'\n'Umpire galat tha'\n'Hawa tez thi'\nIndia jeeta:\n'HUMARA TEAM BEST HAI DUNIA MEIN'",sub:"sports analytics"},
+    {t:"SHAADI FOOD",m:"Shaadi mein gaye.\nKhana khaya.\nRelatives se mila.\nGhar aaye.\nNext day bhi dastarkhwan ki taste yaad hai.\nShaadi: 5/7.",sub:"wedding review"},
+  ],
+};
+
+const CATS=Object.keys(CONTENT);
+const CAT_LABELS={
+  hacker:"⚡ HACKER MODE",aunty:"👁️ AUNTY NETWORK",
+  advice:"🧠 LIFE ADVICE",roast:"🔥 YOU'VE BEEN ROASTED",
+  fact:"📡 USELESS FACT",desi:"🫓 DESI MOMENT"
+};
+
+let clicks=0;
+let lastCat='';
+const used={};
+CATS.forEach(c=>used[c]=new Set());
+
+function go(){
+  clicks++;
+  updateCounter();
+
+  // pick category (not same twice in a row)
+  let cats=CATS.filter(c=>c!==lastCat);
+  const cat=cats[Math.floor(Math.random()*cats.length)];
+  lastCat=cat;
+
+  // pick unused item from category
+  const pool=CONTENT[cat];
+  let available=pool.filter((_,i)=>!used[cat].has(i));
+  if(available.length===0){used[cat].clear();available=pool;}
+  const idx=pool.indexOf(available[Math.floor(Math.random()*available.length)]);
+  used[cat].add(idx);
+  const item=pool[idx];
+
+  // flash
+  flash(cat);
+
+  // shake body
+  document.querySelector('.wrap').classList.remove('shake');
+  void document.querySelector('.wrap').offsetWidth;
+  document.querySelector('.wrap').classList.add('shake');
+  setTimeout(()=>document.querySelector('.wrap').classList.remove('shake'),300);
+
+  // particles
+  burst(cat);
+
+  // update content
+  setTimeout(()=>{
+    // remove old cat class
+    CATS.forEach(c=>document.body.classList.remove('cat-'+c));
+    document.body.classList.add('cat-'+cat);
+
+    document.getElementById('out-tag').textContent=CAT_LABELS[cat];
+    const textEl=document.getElementById('out-text');
+    textEl.textContent=item.m;
+    document.getElementById('out-sub').textContent=item.sub;
+
+    textEl.classList.remove('slidein');
+    void textEl.offsetWidth;
+    textEl.classList.add('slidein');
+
+    // blob color
+    const colors={hacker:'rgba(0,255,136,0.06)',aunty:'rgba(255,136,204,0.06)',advice:'rgba(255,215,0,0.06)',roast:'rgba(255,68,34,0.06)',fact:'rgba(136,170,255,0.06)',desi:'rgba(255,136,0,0.06)'};
+    document.getElementById('blob').style.background=`radial-gradient(ellipse at 50% 50%, ${colors[cat]} 0%, transparent 70%)`;
+  },80);
+}
+
+function updateCounter(){
+  const msgs=['CLICK THE BUTTON. TRUST.','AGAIN.','KEEP GOING.','SERIOUSLY?','TU BORED HAI NA.','EXPECTED.','EK AUR.','OKAY THEEK HAI.','RESPECT.','ALMOST KUCH HUA.'];
+  const c=document.getElementById('counter');
+  if(clicks<=1) c.textContent='CLICK #'+clicks+' — SHURU HUA';
+  else if(clicks<10) c.textContent='CLICK #'+clicks+' — '+msgs[Math.min(clicks-1,msgs.length-1)];
+  else if(clicks===10) c.textContent='10 CLICKS — TU BORED HAI CONFIRMED';
+  else if(clicks===20) c.textContent='20 CLICKS — BHAI BAHAR JA';
+  else if(clicks===50) c.textContent='50 CLICKS — CERTIFIED TIME WASTER 🏆';
+  else if(clicks===100) c.textContent='100 CLICKS. WE HAVE NO WORDS. RESPECT.';
+  else c.textContent='CLICK #'+clicks+' — TU NAHI RUKEGA/RUKEGI';
+}
+
+function flash(cat){
+  const colors={hacker:'#00ff88',aunty:'#ff88cc',advice:'#ffd700',roast:'#ff4422',fact:'#88aaff',desi:'#ff8800'};
+  const f=document.getElementById('flash');
+  f.style.background=colors[cat];
+  f.style.opacity='0.06';
+  setTimeout(()=>f.style.opacity='0',150);
+}
+
+function burst(cat){
+  const colors={hacker:'#00ff88',aunty:'#ff88cc',advice:'#ffd700',roast:'#ff4422',fact:'#88aaff',desi:'#ff8800'};
+  const btn=document.getElementById('btn');
+  const r=btn.getBoundingClientRect();
+  const cx=r.left+r.width/2,cy=r.top+r.height/2;
+  for(let i=0;i<12;i++){
+    const p=document.createElement('div');
+    p.className='p';
+    const sz=Math.random()*8+3;
+    const ang=Math.random()*Math.PI*2;
+    const dist=Math.random()*80+30;
+    const dx=Math.cos(ang)*dist,dy=Math.sin(ang)*dist;
+    const dur=Math.random()*0.4+0.3;
+    p.style.cssText=`width:${sz}px;height:${sz}px;left:${cx}px;top:${cy}px;background:${colors[cat]};--dx:${dx}px;--dy:${dy}px;animation-duration:${dur}s;`;
+    document.body.appendChild(p);
+    setTimeout(()=>p.remove(),dur*1000+100);
+  }
+}
+</script>
 </body>
 </html>
